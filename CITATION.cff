@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this implementation, audit, or experiment snapshot, cite this repository and version; also cite the original method/dataset paper listed in the README."
+type: software
+title: "Multi-Branch Multimodal Prognostics"
+version: 1.0.0
+date-released: 2026-10-14
+authors:
+  - family-names: "Wang"
+    given-names: "JJ"
+repository-code: "https://github.com/13536309143/multi-branch-multimodal-prognostics"
+license: MIT
+keywords:
+  - multimodal learning
+  - prognostics
+  - degradation prediction
+  - multi-branch neural networks
+  - source-aware evaluation

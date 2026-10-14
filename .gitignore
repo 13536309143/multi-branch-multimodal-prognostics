@@ -1,0 +1,23 @@
+.venv/
+.python/
+.tools/
+.publication/
+__pycache__/
+.pytest_cache/
+*.egg-info/
+assets/*.zip
+assets/*.txt
+artifacts/
+results/
+Multimodal data for prognostics/
+*.pyc
+*.pyo
+.coverage
+htmlcov/
+build/
+dist/
+*.log
+*.tmp
+.env
+.env.*
+mbdnn-data-*/

@@ -1,0 +1,32 @@
+[
+  {
+    "fold": 0,
+    "train_test_source_overlap": [],
+    "train_validation_source_overlap": [],
+    "validation_test_source_overlap": []
+  },
+  {
+    "fold": 1,
+    "train_test_source_overlap": [],
+    "train_validation_source_overlap": [],
+    "validation_test_source_overlap": []
+  },
+  {
+    "fold": 2,
+    "train_test_source_overlap": [],
+    "train_validation_source_overlap": [],
+    "validation_test_source_overlap": []
+  },
+  {
+    "fold": 3,
+    "train_test_source_overlap": [],
+    "train_validation_source_overlap": [],
+    "validation_test_source_overlap": []
+  },
+  {
+    "fold": 4,
+    "train_test_source_overlap": [],
+    "train_validation_source_overlap": [],
+    "validation_test_source_overlap": []
+  }
+]

@@ -1,0 +1,376 @@
+{
+  "trajectories": 50,
+  "samples": 7626,
+  "samples_per_trajectory": {
+    "1": 147,
+    "2": 154,
+    "3": 150,
+    "4": 150,
+    "5": 155,
+    "6": 150,
+    "7": 149,
+    "8": 154,
+    "9": 148,
+    "10": 149,
+    "11": 149,
+    "12": 150,
+    "13": 150,
+    "14": 150,
+    "15": 164,
+    "16": 164,
+    "17": 148,
+    "18": 147,
+    "19": 165,
+    "20": 150,
+    "21": 169,
+    "22": 149,
+    "23": 150,
+    "24": 150,
+    "25": 149,
+    "26": 149,
+    "27": 149,
+    "28": 175,
+    "29": 150,
+    "30": 150,
+    "31": 147,
+    "32": 154,
+    "33": 150,
+    "34": 150,
+    "35": 155,
+    "36": 150,
+    "37": 149,
+    "38": 154,
+    "39": 148,
+    "40": 149,
+    "41": 149,
+    "42": 150,
+    "43": 150,
+    "44": 150,
+    "45": 164,
+    "46": 164,
+    "47": 148,
+    "48": 147,
+    "49": 165,
+    "50": 150
+  },
+  "image_counts": {
+    "blank": 1534,
+    "signal": 6092
+  },
+  "image_modes": {
+    "1": 7626
+  },
+  "image_sizes_width_height": {
+    "(194, 325)": 7626
+  },
+  "blank_template_pixel_sha256": "a940f63109555c08d232a75354d2e8a9edf7ca609ca9854a29e4e57802b1bad7",
+  "blank_template_has_axes": true,
+  "max_tokenized_words": 27,
+  "unique_texts": 794,
+  "target_min": 12.75,
+  "target_max": 104.83524,
+  "feature_order": [
+    "chemical_cleanings",
+    "mechanical_cleanings_since_chemical",
+    "time_since_repair",
+    "time_to_next_inspection"
+  ],
+  "feature_min": [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+  ],
+  "feature_max": [
+    19.0,
+    7.0,
+    99.0,
+    50.0
+  ],
+  "training_executed": false,
+  "distinct_input_history_groups": 30,
+  "duplicate_history_groups": [
+    [
+      1,
+      31
+    ],
+    [
+      2,
+      32
+    ],
+    [
+      3,
+      33
+    ],
+    [
+      4,
+      34
+    ],
+    [
+      5,
+      35
+    ],
+    [
+      6,
+      36
+    ],
+    [
+      7,
+      37
+    ],
+    [
+      8,
+      38
+    ],
+    [
+      9,
+      39
+    ],
+    [
+      10,
+      40
+    ],
+    [
+      11,
+      41
+    ],
+    [
+      12,
+      42
+    ],
+    [
+      13,
+      43
+    ],
+    [
+      14,
+      44
+    ],
+    [
+      15,
+      45
+    ],
+    [
+      16,
+      46
+    ],
+    [
+      17,
+      47
+    ],
+    [
+      18,
+      48
+    ],
+    [
+      19,
+      49
+    ],
+    [
+      20,
+      50
+    ]
+  ],
+  "duplicate_evidence": [
+    {
+      "trajectories": [
+        1,
+        31
+      ],
+      "samples": 147,
+      "different_image_rows": 0,
+      "different_target_rows": 0,
+      "input_time_text_numeric_identical": true
+    },
+    {
+      "trajectories": [
+        2,
+        32
+      ],
+      "samples": 154,
+      "different_image_rows": 0,
+      "different_target_rows": 0,
+      "input_time_text_numeric_identical": true
+    },
+    {
+      "trajectories": [
+        3,
+        33
+      ],
+      "samples": 150,
+      "different_image_rows": 0,
+      "different_target_rows": 0,
+      "input_time_text_numeric_identical": true
+    },
+    {
+      "trajectories": [
+        4,
+        34
+      ],
+      "samples": 150,
+      "different_image_rows": 0,
+      "different_target_rows": 0,
+      "input_time_text_numeric_identical": true
+    },
+    {
+      "trajectories": [
+        5,
+        35
+      ],
+      "samples": 155,
+      "different_image_rows": 0,
+      "different_target_rows": 0,
+      "input_time_text_numeric_identical": true
+    },
+    {
+      "trajectories": [
+        6,
+        36
+      ],
+      "samples": 150,
+      "different_image_rows": 0,
+      "different_target_rows": 0,
+      "input_time_text_numeric_identical": true
+    },
+    {
+      "trajectories": [
+        7,
+        37
+      ],
+      "samples": 149,
+      "different_image_rows": 0,
+      "different_target_rows": 0,
+      "input_time_text_numeric_identical": true
+    },
+    {
+      "trajectories": [
+        8,
+        38
+      ],
+      "samples": 154,
+      "different_image_rows": 1,
+      "different_target_rows": 0,
+      "input_time_text_numeric_identical": true
+    },
+    {
+      "trajectories": [
+        9,
+        39
+      ],
+      "samples": 148,
+      "different_image_rows": 1,
+      "different_target_rows": 0,
+      "input_time_text_numeric_identical": true
+    },
+    {
+      "trajectories": [
+        10,
+        40
+      ],
+      "samples": 149,
+      "different_image_rows": 0,
+      "different_target_rows": 0,
+      "input_time_text_numeric_identical": true
+    },
+    {
+      "trajectories": [
+        11,
+        41
+      ],
+      "samples": 149,
+      "different_image_rows": 0,
+      "different_target_rows": 0,
+      "input_time_text_numeric_identical": true
+    },
+    {
+      "trajectories": [
+        12,
+        42
+      ],
+      "samples": 150,
+      "different_image_rows": 0,
+      "different_target_rows": 0,
+      "input_time_text_numeric_identical": true
+    },
+    {
+      "trajectories": [
+        13,
+        43
+      ],
+      "samples": 150,
+      "different_image_rows": 0,
+      "different_target_rows": 0,
+      "input_time_text_numeric_identical": true
+    },
+    {
+      "trajectories": [
+        14,
+        44
+      ],
+      "samples": 150,
+      "different_image_rows": 0,
+      "different_target_rows": 0,
+      "input_time_text_numeric_identical": true
+    },
+    {
+      "trajectories": [
+        15,
+        45
+      ],
+      "samples": 164,
+      "different_image_rows": 0,
+      "different_target_rows": 0,
+      "input_time_text_numeric_identical": true
+    },
+    {
+      "trajectories": [
+        16,
+        46
+      ],
+      "samples": 164,
+      "different_image_rows": 1,
+      "different_target_rows": 0,
+      "input_time_text_numeric_identical": true
+    },
+    {
+      "trajectories": [
+        17,
+        47
+      ],
+      "samples": 148,
+      "different_image_rows": 0,
+      "different_target_rows": 0,
+      "input_time_text_numeric_identical": true
+    },
+    {
+      "trajectories": [
+        18,
+        48
+      ],
+      "samples": 147,
+      "different_image_rows": 0,
+      "different_target_rows": 0,
+      "input_time_text_numeric_identical": true
+    },
+    {
+      "trajectories": [
+        19,
+        49
+      ],
+      "samples": 165,
+      "different_image_rows": 0,
+      "different_target_rows": 0,
+      "input_time_text_numeric_identical": true
+    },
+    {
+      "trajectories": [
+        20,
+        50
+      ],
+      "samples": 150,
+      "different_image_rows": 0,
+      "different_target_rows": 0,
+      "input_time_text_numeric_identical": true
+    }
+  ]
+}

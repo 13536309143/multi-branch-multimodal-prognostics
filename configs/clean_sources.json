@@ -1,0 +1,6 @@
+{
+  "extends": "group_validation.json",
+  "artifact_root": "artifacts/clean_sources",
+  "results_root": "results/clean_sources",
+  "outer_grouping": "source_history"
+}

@@ -1,0 +1,9 @@
+{
+  "repo_id": "GeorgeWJJ/steam-generator-multimodal-prognostics",
+  "filename": "steam-generator-multimodal-prognostics.zip",
+  "sha256": "01a2eca1b4c2bd1b3e10d3920d54e2c8760ebbc85786bb328b8179fbdb50d317",
+  "raw_files": 7977,
+  "rows": 7626,
+  "raw_sha256_manifest": "experiments/dataset_checksums.json",
+  "revision": "935d315f9beaa4bcf23676f9ec6396560931e29c"
+}

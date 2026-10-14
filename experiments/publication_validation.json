@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "staged_files": 92,
+  "staged_bytes": 6294139,
+  "readme_languages": 2,
+  "readme_figures_per_language": 12,
+  "experiment_archive_result_records": 500,
+  "zip_crc_verified": true,
+  "credential_patterns_found": 0,
+  "essential_checks_passed": 27,
+  "saved_test_result_metrics_recomputed": 500,
+  "representative_dnn_and_svr_replay_max_difference": 0,
+  "new_training_executed": false
+}

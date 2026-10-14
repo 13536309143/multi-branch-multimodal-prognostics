@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "multi-branch-multimodal-prognostics"
+version = "1.0.0"
+description = "Multi-branch neural networks for multimodal degradation prediction and source-aware evaluation"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.26,<3", "Pillow>=10,<13", "torch>=2.2,<3", "scikit-learn>=1.5,<2", "matplotlib>=3.8,<4"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10"]
+
+[project.scripts]
+mbdnn = "mbdnn.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["mbdnn*"]
+
+[tool.pytest.ini_options]
+testpaths = ["checks"]

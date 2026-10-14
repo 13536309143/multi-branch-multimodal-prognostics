@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "expected_model_seed_fold_runs": 250,
+  "checked_runs": 250,
+  "test_and_validation_metrics_recomputed": true,
+  "every_sample_tested_once_per_seed_model": true,
+  "model_files_present": true,
+  "checkpoint_weights_replayed": false
+}

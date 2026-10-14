@@ -1,0 +1,8 @@
+# Core versions used by the completed 2026-10-14 experiment snapshot.
+# Choose the appropriate PyTorch wheel separately for your CPU/CUDA environment.
+numpy==1.26.4
+Pillow==11.1.0
+torch==2.7.1
+scikit-learn==1.5.2
+matplotlib==3.9.4
+pytest==8.3.5

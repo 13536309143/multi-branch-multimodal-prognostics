@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "completed_results_read": 500,
+  "selected_checkpoints_replayed": 10,
+  "maximum_replayed_prediction_difference": 0,
+  "embedded_figures": 4,
+  "missing_local_links": [],
+  "optimizer_updates": 0
+}

@@ -1,0 +1,6 @@
+{
+  "extends": "paper.json",
+  "artifact_root": "artifacts/group_validation",
+  "results_root": "results/group_validation",
+  "validation": "trajectory"
+}
