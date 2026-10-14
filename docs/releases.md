@@ -16,6 +16,8 @@
 
 两套ZIP解压后，运行 `python scripts/build_figures.py` 可根据冻结预测和 `experiments/analysis/diagnostics.json` 重新生成12组发布图表，不进行训练。
 
+图表支持 `--language en`、`--language zh` 或 `--language both`（默认）。英文图在 `docs/figures/`，中文图在 `docs/figures/zh-CN/`；中文渲染需要中文字体，可安装Noto Sans CJK或指定 `--font-file <字体文件>`。
+
 ## English
 
 Each experiment asset contains 250 complete records, native checkpoints/models, per-row predictions, histories, preprocessing, fixed partitions, audit artifacts, and full reports/figures. Extract into the project root to restore relative `results/` and `artifacts/` paths, or inspect in a separate directory before replacing anything. The evaluation helper rebases raw-data paths at runtime.

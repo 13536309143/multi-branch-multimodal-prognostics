@@ -1,58 +1,72 @@
-# 多分支神经网络的多模态退化预测
+# Multi-Branch Multimodal Prognostics
 
-**Multi-Branch Multimodal Prognostics：融合信号图像、检修文本与数值历史，预测设备下一次检查时的退化程度。**
+**Predict next-inspection degradation from signal images, maintenance text, and numerical history.**
 
-[English](README.en.md) · [Hugging Face 数据集](https://huggingface.co/datasets/GeorgeWJJ/steam-generator-multimodal-prognostics) · [完整实验与模型](https://github.com/13536309143/multi-branch-multimodal-prognostics/releases/tag/v1.0.0) · [方法细节](docs/methodology.md) · [验证说明](docs/validation.md)
+[简体中文](README.zh-CN.md) · [Dataset](https://huggingface.co/datasets/GeorgeWJJ/steam-generator-multimodal-prognostics) · [Models and full experiments](https://github.com/13536309143/multi-branch-multimodal-prognostics/releases/tag/v1.0.0) · [Method details](docs/methodology.md) · [Validation](docs/validation.md)
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue) ![PyTorch](https://img.shields.io/badge/PyTorch-2.7.1-orange) ![Code license](https://img.shields.io/badge/Code-MIT-green) ![Completed results](https://img.shields.io/badge/Experiment_results-500%2F500-success)
 
-本项目提供从多模态数据准备、模型训练、分组评估到权重推理和结果报告的完整研究流程。已发布实验包含 **2 套协议 × 10 种方法 × 5 折 × 5 个训练种子 = 500 项结果**，其中450项模型拟合、50项加权组合。
+An end-to-end workflow for multimodal degradation prediction: aligned data preparation, modality-specific neural branches, grouped evaluation, saved-model inference, and traceable experiment reports. The published snapshot contains **two protocols × ten methods × five folds × five training seeds = 500 result records**, comprising 450 model fits and 50 weighted combinations.
 
-## 实验目的与功能
+## Method highlights and project contributions
 
-- 比较图像、文本、数值及其组合对下一次检查退化预测的贡献。
-- 在同协议、同折和同种子下评估七种神经网络组合、加权集成、SVR和随机森林。
-- 检查重复历史、文本重用、无信号图像和设备差异对泛化表现的影响。
-- 提供训练集预处理、验证集模型选择、固定划分、完整性校验和可追溯结果。
-- 支持Windows一键执行；输出最佳权重、逐样本预测、CSV指标、PNG/PDF图表和含全部50个目录轨迹的独立HTML报告。
+**Modality-specific learning → feature-level fusion → source-aware generalization assessment.**
 
-## 方法原理
+| Highlight | What this project implements | Supporting artifact |
+|---|---|---|
+| Joint multimodal representation learning | Image CNN, short-text CNN and numerical branch are optimized together for one degradation objective; feature-level fusion combines their compact representations. | Architecture diagram, trained `itn` checkpoints |
+| One framework for seven modality combinations | The same branch definitions and matched partitions support single-, double- and triple-modality models, separating information-source effects from changes in architecture. | Seven neural variants and ten-method benchmark |
+| Source-aware validation | An input-history audit identifies 30 distinct sources behind 50 folders; source-group isolation prevents copied histories from crossing training, validation and test. | Input-based grouping, fixed folds and overlap audit |
+| Failure-mode and modality diagnostics | Source-level errors, missing-image subsets, target-range bias and held-out trajectories expose when additional modalities help or hurt under the evaluated settings. | Twelve figure groups, paired protocol results |
+| Verifiable experiment delivery | Train-only preprocessing, validation-only selection, SHA-256 manifests, prediction/metric checks and native checkpoint replay connect reported scores to downloadable artifacts. | 500 result records, 27 essential checks, complete model release |
 
-![网络结构](docs/figures/architecture.png)
+The feature-learning architecture builds on the cited MB-DNN method. This project's additions are the source-history audit and isolated evaluation, unified verification tools, detailed diagnostics, and complete experiment packaging. Performance claims are limited to the reported settings: directory-level three-branch MAE is **4.8567**, while source-isolated evaluation identifies **SVR and image+numerical as the stronger baselines**.
 
-| 分支 | 输入 | 特征提取 | 输出 |
+## Objectives and capabilities
+
+- Compare image, text, numerical, and combined representations for future degradation prediction.
+- Evaluate seven neural modality combinations, a weighted ensemble, SVR, and random forest on matching partitions within each protocol.
+- Audit repeated histories, text reuse, missing-image templates, and source-level generalization.
+- Fit scalers/vocabulary on training rows; choose checkpoints and ensemble weights using validation data.
+- Provide Windows one-click execution, 27 essential checks, trained weights, per-row predictions, CSV metrics, PNG/PDF figures, and standalone HTML reports covering all 50 folders.
+
+## Method
+
+![Architecture](docs/figures/architecture.png)
+
+| Branch | Input | Feature extraction | Output |
 |---|---|---|---|
-| 图像 `i` | `1×325×194` 灰度张量 | 三层卷积/ReLU/最大池化；通道4/4/8、卷积核4、池化4；展平192维后接sigmoid全连接层 | 4维 |
-| 文本 `t` | 最多27词，GloVe 6B/100d | 冻结词向量；窗口2/3/4各32个Conv1D滤波器；全局最大池化、sigmoid全连接层 | 4维 |
-| 数值 `n` | 四个训练集标准化变量 | 全连接 `4→4`、sigmoid | 4维 |
-| 融合 | 所选分支特征 | 拼接后接线性标量回归层 | 下一次检查退化 |
+| Image `i` | `1×325×194` grayscale tensor | Three Conv2D/ReLU/max-pool stages; channels 4/4/8, kernel 4, pool 4; flatten 192; sigmoid dense | 4 features |
+| Text `t` | ≤27 tokens; GloVe 6B / 100d | Frozen embeddings; Conv1D windows 2/3/4, 32 filters each; global max pooling; sigmoid dense | 4 features |
+| Numerical `n` | Four train-standardized variables | Dense `4→4`, sigmoid | 4 features |
+| Fusion | Selected branch features | Concatenation and linear scalar regression | Next-inspection degradation |
 
-图像使用明确的非对称SAME补零和向上取整池化；原像素除以255，不缩放、不裁剪坐标轴。文本小写化、保留词内撇号，超过27词报错；词表仅由训练数据建立。融合头本身没有非线性跨模态交互。
+Images use explicit asymmetric SAME padding and ceiling pooling, division by 255, and no resizing/axis cropping. Text is lowercased with contractions retained; overlength records raise an error. Vocabulary uses training data only. The linear fusion head itself has no nonlinear cross-modal interaction.
 
-训练使用标准化目标MSE、Adam（lr=0.001）、batch=64、最多500轮；验证MSE早停patience=40、min_delta=1e-5，恢复最佳权重，评价前还原目标单位。具体选择见[方法说明](docs/methodology.md)。
+Optimization: standardized-target MSE; Adam, lr 0.001; batch 64; maximum 500 epochs; validation-MSE early stopping, patience 40 and min_delta 1e-5; restore the best checkpoint. Metrics use inverse-transformed targets. See [implementation details](docs/methodology.md).
 
-## 数据准备
+## Dataset preparation
 
-数据为Yang、Baraldi、Zio发布的蒸汽发生器**合成**多模态基准。本项目维护镜像、校验和评估元数据，不将上传者表述为原数据作者。
+The Hugging Face repository is an attributed mirror of the **synthetic** steam-generator benchmark by Yang, Baraldi, and Zio. The project maintains packaging and audit metadata; the uploader is not the original dataset author.
 
-![数据概览](docs/figures/dataset_overview.png)
+![Dataset overview](docs/figures/dataset_overview.png)
 
-| 属性 | 数值 |
+| Property | Value |
 |---|---:|
-| 对齐观测 / 原始目录 | 7,626 / 50 |
-| 不同时间、文本、数值输入历史 | 30 |
-| 信号 / 无信号模板图像 | 6,092 / 1,534 |
-| 不同完整文本 / 最大分词长度 | 794 / 27 |
-| 目标范围 | 12.75–104.83524 |
+| Aligned observations / original folders | 7,626 / 50 |
+| Distinct time/text/numerical histories | 30 |
+| Signal / no-signal images | 6,092 / 1,534 |
+| Distinct complete texts / maximum tokens | 794 / 27 |
+| Target range | 12.75–104.83524 |
 
-环境安装后，在项目根目录执行：
+After installing the environment, download from the project root:
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\download_dataset.py
 .\.venv\Scripts\python.exe scripts\download_dataset.py --verify-only
 ```
 
-下载器固定 `dataset.json` 中的Hugging Face提交，检查ZIP哈希和全部 **7,977个原始文件**；已有数据校验通过后直接保留，不覆盖不匹配文件。
+The downloader pins the Hub commit in `dataset.json`, verifies the archive and all **7,977 raw files**, and preserves existing verified data. Mismatched existing data are not overwritten.
 
 ```text
 Multimodal data for prognostics/
@@ -68,24 +82,24 @@ Multimodal data for prognostics/
 └── ... 50/
 ```
 
-序列第X行对应 `Image/X.tiff`。`nextinslevel.txt` 已是下一次检查退化，**不再平移标签**；`nextinstime.txt` 是已知的计划检查间隔，不是RUL。没有新文本时保留上一条记录；无信号图仍有坐标轴，默认保留。模型输入仅为图像、文本和四个数值变量，不使用设备/来源编号、绝对时间或标签作额外特征。
+The X-th sequence row aligns with `Image/X.tiff`. `nextinslevel.txt` already targets the next inspection: **do not shift labels again**. `nextinstime.txt` is a known planned interval, not RUL. Previous text repeats when no new record exists; no-signal templates retain axes. Only image, text, and four numerical variables enter the model; identifiers, absolute time, source labels, and targets are not extra features.
 
-可选的数据浏览方式（需额外安装 `datasets`）：
+Optional exploration, with the additional `datasets` package:
 
 ```python
 from datasets import load_dataset
 data = load_dataset("GeorgeWJJ/steam-generator-multimodal-prognostics", split="train")
 ```
 
-HF中的 `train` 是全量数据的存储分区，不是实验训练集；拟合前须应用分组索引。
+This `train` partition stores the entire dataset. Apply the provided grouped experimental indices before fitting.
 
-## 环境安装与验证
+## Environment setup and verification
 
-已完成实验使用Python 3.11.17、PyTorch 2.7.1+cu126、NumPy 1.26.4、Pillow 11.1.0、scikit-learn 1.5.2、Matplotlib 3.9.4，GPU为RTX 4070 Laptop。建议Python 3.11；包支持Python 3.10+。
+Recorded environment: Python 3.11.17, PyTorch 2.7.1+cu126, NumPy 1.26.4, Pillow 11.1.0, scikit-learn 1.5.2, Matplotlib 3.9.4, RTX 4070 Laptop GPU. Python 3.11 is recommended; the package supports Python 3.10+.
 
 ```powershell
 py -3.11 -m venv .venv
-# 二选一：CUDA 12.6 或 CPU。CUDA需要兼容的NVIDIA驱动。
+# Choose ONE PyTorch wheel: CUDA 12.6 or CPU.
 .\.venv\Scripts\python.exe -m pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu126
 # .\.venv\Scripts\python.exe -m pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cpu
 .\.venv\Scripts\python.exe -m pip install -r requirements-verified.txt
@@ -93,11 +107,11 @@ py -3.11 -m venv .venv
 .\.venv\Scripts\python.exe scripts\verify_environment.py
 ```
 
-Linux/macOS创建并激活Python虚拟环境后，使用相应PyTorch轮子和相同依赖，将下面命令的解释器替换为 `python`。`device=auto` 有CUDA则使用CUDA，否则CPU。`requirements-recovered.txt` 是历史完整环境记录，其CUDA专用版本不适合所有平台。
+Linux/macOS: create/activate a Python virtual environment, install the platform-appropriate PyTorch wheel and the same core pins, and substitute `python` for the Windows interpreter below. CUDA requires a compatible NVIDIA driver. `device=auto` falls back to CPU. `requirements-recovered.txt` preserves the historical full freeze; its CUDA wheel is not a universal installation recipe.
 
-项目包含原版GloVe 6B/100d相关词汇子集，需要重新准备时运行 `python -m mbdnn fetch-embeddings`。资源不存在且已有原版词向量文件时，可追加 `--local-file C:\path\glove.6B.100d.txt`。
+The original GloVe 6B / 100d dataset-word subset is included. `python -m mbdnn fetch-embeddings` prepares a missing asset; add `--local-file C:\path\glove.6B.100d.txt` to use a local original vector file when the asset is absent.
 
-## 数据、结构与流程验证
+## Data, architecture, and workflow validation
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\download_dataset.py --verify-only
@@ -108,145 +122,145 @@ Linux/macOS创建并激活Python虚拟环境后，使用相应PyTorch轮子和�
 .\.venv\Scripts\python.exe -m pytest -q checks
 ```
 
-检查覆盖哈希、逐行对齐、图像尺寸、目标、固定划分、重复来源、训练集预处理、七种网络前向、指标和工作流。`verify` 仅前向推理，不更新权重、不代表性能评价。`checks/` 保留一键入口依赖的 **27项关键检查**；临时恢复脚本与缓存不进入发布仓库。
+Checks cover hashes, row alignment, image dimensions, targets, fixed folds, repeated sources, train-only preprocessing, seven forward paths, metric definitions, and orchestration. `verify` performs inference only, not weight optimization or predictive evaluation. `checks/` retains the **27 essential checks** used by the one-click preflight. Temporary recovery scripts and caches are excluded from the public repository.
 
-## 实验协议
+## Evaluation protocols
 
-| 协议 | 配置 | 外层测试 | 内部验证 |
+| Protocol | Config | Outer test | Inner validation |
 |---|---|---|---|
-| 目录级 | `configs/paper.json` | 随机五折，每折10个目录 | 剩余行随机取约5% |
-| 来源隔离 | `configs/clean_sources.json` | 五折，每折10个目录、6个来源 | 其余24个来源取2组，实际行比例5.33%～9.82% |
-| 目录级验证对照 | `configs/group_validation.json` | 与目录级相同外层 | 整个目录验证；已准备，**未纳入已完成结果** |
+| Directory-level | `configs/paper.json` | Five shuffled folds; ten folders per fold | Random ~5% of remaining rows |
+| Source-isolated | `configs/clean_sources.json` | Five folds; ten folders / six sources per fold | Two of remaining 24 sources; actual row fraction5.33–9.82% |
+| Directory validation control | `configs/group_validation.json` | Same directory outer folds | Whole-folder validation; prepared, **not in completed results** |
 
-划分种子2021，训练种子2021～2025；同协议的五种子共用固定外层划分，反映训练随机性。
+Split seed 2021; training seeds2021–2025 share fixed outer folds within each protocol. They measure training randomness, not five independently randomized splits.
 
-目录1～20与31～50成对共享时间、文本、数值和标签。17对图像也相同，8/38、9/39、16/46各仅一张不同。按目录隔离仍可能有复制来源跨集合；来源隔离将同源记录放在同组。分组不使用目标，不作为模型输入。原始重复记录全部保留，复制历史仍影响样本权重。
+Folders1–20 pair with 31–50 in time/text/numerical histories and targets. Seventeen pairs also match in all images; 8/38,9/39,16/46 differ in one image each. Directory grouping can expose repeated sources across partitions. Source grouping uses inputs without targets and is never a predictor input. Raw duplicates remain and still affect sample weights.
 
-两协议同时改变外层分组和内部验证，性能差异不能单独解释为重复来源的因果效应。
+Both outer grouping and inner validation change between protocols; performance differences do not isolate the causal effect of source exposure.
 
-## 训练与一键报告
+## Training and one-click reports
 
 ```powershell
-# 只检查，不训练。
+# Preflight only; no training.
 .\train_and_report.bat --check-only --no-open
-# 两套协议、十方法、五折、五种子。
+# Both protocols, all methods, five folds, five seeds.
 .\train_and_report.bat
-# 仅来源隔离。
+# Source-isolated only.
 .\train_and_report.bat --protocol clean
 ```
 
-入口优先使用项目 `.venv`，支持 `MBDNN_PYTHON` 指定解释器。工作流执行检查、数据/向量准备、结构验证、训练、指标重算和报告生成；日志与报告入口在 `artifacts/automation/<时间戳>/`。
+The launcher prefers project `.venv` or uses the explicitly configured `MBDNN_PYTHON`. It checks contracts, prepares data/vectors, verifies networks, trains, recomputes metrics, and creates reports. Logs/report index: `artifacts/automation/<timestamp>/`.
 
 ```powershell
-# 小范围执行，不作为完整成绩。
+# Limited execution scope; not a full benchmark.
 .\.venv\Scripts\python.exe -m mbdnn --config configs/clean_sources.json train --models itn in svr rf --seeds 2021 --folds 0
-# 完整实验，跳过同指纹已完成模型。
+# Full benchmark; skip complete models with the same fingerprint.
 .\.venv\Scripts\python.exe -m mbdnn --config configs/clean_sources.json train --resume
 ```
 
-`i/t/n` 分别是图像/文本/数值；单、双分支独立训练。集成用验证MAE倒数归一化选权重。`--resume` 跳过完成模型，未完成模型从头训练，不是任意epoch的优化器状态续训。代码、配置、数据或项目路径变化会改变指纹，历史快照保持独立。
+`i/t/n` denote image/text/numerical. Single/double branches are independently trained. Ensemble weights are normalized inverse validation MAE. Resume skips completed models; unfinished models restart from scratch, rather than continuing arbitrary-epoch optimizer state. Code, configuration, data, or project-location changes create a new fingerprint; historical snapshots remain separate.
 
-## 测试已保存模型
+## Test saved models
 
-[Release](https://github.com/13536309143/multi-branch-multimodal-prognostics/releases/tag/v1.0.0)提供所有权重、预测与报告。实验ZIP解压至项目根目录；原训练记录保留，测试助手在运行时定位本机数据路径。
+[Release assets](https://github.com/13536309143/multi-branch-multimodal-prognostics/releases/tag/v1.0.0) contain every model, prediction, and report. Extract an experiment ZIP into the project root. Original training records are retained; the evaluation helper resolves the current data location at runtime.
 
 ```powershell
-# 从保存预测重算测试指标，不训练。
+# Recompute saved test metrics, without training.
 .\.venv\Scripts\python.exe scripts\evaluate_snapshot.py results\clean_sources\aaaa63a00b5260a1
-# 最佳权重重新推理原测试行。
+# Replay a trained best checkpoint on the original test rows.
 .\.venv\Scripts\python.exe scripts\evaluate_snapshot.py results\clean_sources\aaaa63a00b5260a1 --replay --model itn --seed 2021 --fold 0
-# 数值基线也可重放。
+# Numerical baseline replay.
 .\.venv\Scripts\python.exe scripts\evaluate_snapshot.py results\clean_sources\aaaa63a00b5260a1 --replay --model svr --seed 2021 --fold 0
 ```
 
-新结果使用程序输出的指纹：
+For new runs use the fingerprint printed by the program:
 
 ```powershell
 .\.venv\Scripts\python.exe -m mbdnn summarize results/clean_sources/<fingerprint>
 .\.venv\Scripts\python.exe -m mbdnn plot results/clean_sources/<fingerprint> --seed 2021 --trajectory 19 --models itn in svr
 ```
 
-## 实验结果
+## Benchmark results
 
-MAE/MSE/MRE均越低越好。MRE是 `100 × mean(|预测−真实|/真实)`，不是准确率。每种子先对五折等权平均，再对五种子求均值及样本标准差；±仅反映训练随机性。SVR固定划分下标准差为0，不代表新设备的不确定性为0。
+MAE/MSE/MRE are lower-is-better. MRE is `100 × mean(abs(prediction−target)/target)`, not accuracy. Average five folds equally per seed, then report the five-seed mean/sample SD. SD measures training randomness only; deterministic SVR's zero SD does not establish zero generalization uncertainty.
 
-| 方法 | 目录级MAE ± SD | MSE | MRE% | 来源隔离MAE ± SD | MSE | MRE% |
+| Method | Directory MAE ± SD | MSE | MRE% | Source-isolated MAE ± SD | MSE | MRE% |
 |---|---|---|---|---|---|---|
-| itn: 图像＋文本＋数值 | 4.8567 ± 0.2137 | 78.80 | 9.18 | 12.5125 ± 0.9725 | 268.26 | 25.99 |
-| in: 图像＋数值 | 6.4311 ± 0.4724 | 72.48 | 11.96 | 7.0984 ± 0.2347 | 87.44 | 12.90 |
-| tn: 文本＋数值 | 5.0892 ± 0.1895 | 91.50 | 9.50 | 12.0295 ± 0.6543 | 258.04 | 23.03 |
-| it: 图像＋文本 | 7.0605 ± 0.0937 | 172.55 | 14.56 | 14.9385 ± 0.2243 | 362.06 | 32.03 |
-| i: 仅图像 | 15.0934 ± 0.1307 | 371.75 | 32.34 | 15.4296 ± 0.0650 | 375.45 | 32.84 |
-| t: 仅文本 | 7.0622 ± 0.1344 | 176.81 | 14.45 | 16.7257 ± 0.2829 | 457.35 | 34.80 |
-| n: 数值DNN | 7.4817 ± 0.1247 | 100.22 | 13.17 | 8.1978 ± 0.1204 | 113.25 | 14.91 |
-| ensemble: 单分支加权集成 | 6.6663 ± 0.1043 | 116.23 | 13.58 | 9.5150 ± 0.0252 | 138.83 | 19.45 |
-| svr: 数值SVR | 6.5200 ± 0.0000 | 84.66 | 11.39 | 6.8405 ± 0.0000 | 90.85 | 11.92 |
-| rf: 数值随机森林 | 5.7553 ± 0.0070 | 71.23 | 10.42 | 7.4899 ± 0.0089 | 111.32 | 13.40 |
+| itn: Image + text + numerical | 4.8567 ± 0.2137 | 78.80 | 9.18 | 12.5125 ± 0.9725 | 268.26 | 25.99 |
+| in: Image + numerical | 6.4311 ± 0.4724 | 72.48 | 11.96 | 7.0984 ± 0.2347 | 87.44 | 12.90 |
+| tn: Text + numerical | 5.0892 ± 0.1895 | 91.50 | 9.50 | 12.0295 ± 0.6543 | 258.04 | 23.03 |
+| it: Image + text | 7.0605 ± 0.0937 | 172.55 | 14.56 | 14.9385 ± 0.2243 | 362.06 | 32.03 |
+| i: Image only | 15.0934 ± 0.1307 | 371.75 | 32.34 | 15.4296 ± 0.0650 | 375.45 | 32.84 |
+| t: Text only | 7.0622 ± 0.1344 | 176.81 | 14.45 | 16.7257 ± 0.2829 | 457.35 | 34.80 |
+| n: Numerical DNN | 7.4817 ± 0.1247 | 100.22 | 13.17 | 8.1978 ± 0.1204 | 113.25 | 14.91 |
+| ensemble: Weighted single-branch ensemble | 6.6663 ± 0.1043 | 116.23 | 13.58 | 9.5150 ± 0.0252 | 138.83 | 19.45 |
+| svr: Numerical SVR | 6.5200 ± 0.0000 | 84.66 | 11.39 | 6.8405 ± 0.0000 | 90.85 | 11.92 |
+| rf: Numerical RF | 5.7553 ± 0.0070 | 71.23 | 10.42 | 7.4899 ± 0.0089 | 111.32 | 13.40 |
 
-![目录级方法对比](docs/figures/benchmark_paper.png)
+![Directory benchmark](docs/figures/benchmark_paper.png)
 
-![来源隔离方法对比](docs/figures/benchmark_clean_sources.png)
+![Source-isolated benchmark](docs/figures/benchmark_clean_sources.png)
 
-目录级：三分支MAE/MRE最低，随机森林MSE最低。来源隔离：SVR的MAE/MRE最低，图像＋数值的MSE最低。图像＋数值相对数值DNN的来源隔离MAE改善13.41%；当前配置中增加文本，三分支相对图像＋数值的MAE增加76.27%。这些结论限于发布的设置，不表示某模态在所有任务中必然有利或有害。
+Directory-level: three-branch achieves lowest MAE/MRE, RF lowest MSE. Source-isolated: SVR achieves lowest MAE/MRE, image+numerical lowest MSE. Image+numerical improves MAE over numerical DNN by 13.41%; adding text to it increases MAE by 76.27% in the current settings. These findings do not imply a universal benefit or harm of a modality.
 
-## 结果图表与诊断
+## Diagnostic figures
 
-**协议敏感性。** 目录级协议中63.76%的测试行有重复来源出现在训练；三分支在这些行MAE为1.78，在未见来源上为10.29。子群难度不同，这属于描述性对照。
+**Protocol sensitivity.** In the directory schedule,63.76% of test rows have a repeated source in training. Three-branch MAE is 1.78 on those rows versus 10.29 on unseen sources. Different subgroup composition makes this descriptive, not causal.
 
-![协议敏感性](docs/figures/protocol_sensitivity.png)
+![Protocol sensitivity](docs/figures/protocol_sensitivity.png)
 
-**训练曲线。** 来源隔离时，一些文本相关模型训练误差下降、验证误差回升；最佳权重重放的一项三分支实验训练MAE=1.58、测试=12.58。训练损失是批次更新期间平均，验证损失是轮末模型计算，图中标记最佳轮次。
+**Training curves.** Some source-isolated text-containing models reduce training loss while validation loss increases. One replayed three-branch checkpoint has training MAE 1.58 and test MAE 12.58. Training loss averages batch updates; validation evaluates end-of-epoch weights. Selected epochs are marked.
 
-![训练曲线](docs/figures/training_curves.png)
+![Training curves](docs/figures/training_curves.png)
 
-**退化分区。** 三分支倾向高估低退化、低估高退化。真实目标分区仅作事后诊断，预测时不能按未知真值选择模型。
+**Degradation ranges.** Three-branch predictions overestimate low degradation and underestimate high degradation. True-target bins are retrospective diagnostics, unavailable for selecting models at prediction time.
 
-![退化分区](docs/figures/degradation_ranges.png)
+![Degradation ranges](docs/figures/degradation_ranges.png)
 
-**逐来源误差。** 30个输入历史各显示一次，合并来源内部全部行和五种子的误差，不把复制件视为独立案例。
+**Source errors.** Thirty histories are shown once each, aggregating all within-source rows and five seeds; duplicated folders are not independent cases.
 
-![来源误差](docs/figures/source_errors.png)
+![Source errors](docs/figures/source_errors.png)
 
-**无信号图像。** 模板占20.12%观测；子群还存在时间、文本与目标差异，不能仅由此断言替换为零矩阵能改善。
+**Image availability.** No-signal templates account for 20.12% of rows. Timing, text, and target distributions also differ; subgroup results do not prove zero-template substitution improves performance.
 
-![图像可用性](docs/figures/image_availability.png)
+![Image availability](docs/figures/image_availability.png)
 
-**预测校准与误差分布。** 散点固定使用种子2021；累积分布合并五种子预测，属于相关重复评价。
+**Calibration and error distributions.** Scatter plots use fixed seed 2021. CDFs combine all five seeds as correlated repeated evaluations.
 
-![预测散点](docs/figures/prediction_scatter.png)
+![Prediction scatter](docs/figures/prediction_scatter.png)
 
-![误差分布](docs/figures/error_distributions.png)
+![Error distributions](docs/figures/error_distributions.png)
 
-**设备轨迹。** 困难来源19/49、16/46使用固定首种子展示，不选择测试表现最好的种子。同源复制件不算独立案例；完整报告含全部50个目录。
+**Held-out trajectories.** Difficult sources 19/49 and16/46 are shown using the first fixed seed, not a best test seed. Full reports cover all 50 folders.
 
-![设备轨迹](docs/figures/trajectory_diagnostics.png)
+![Trajectory diagnostics](docs/figures/trajectory_diagnostics.png)
 
-每图提供同名PDF。逐折、逐目录、退化分区和来源指标见 `experiments/` 与Release。种子标准差、折间差异和来源等权误差分别报告；7,626条相关观测不是7,626台独立机器。
+Each figure has a PDF counterpart. English figures are in `docs/figures/`; Chinese figures are in `docs/figures/zh-CN/`. Regenerate with `python scripts/build_figures.py --language en`, `--language zh`, or `--language both`; Chinese rendering requires a CJK font (or `--font-file`). Fold/trajectory/range/source metrics are in `experiments/` and release reports. Training-seed SD, fold variation, and source-macro errors have distinct meanings;7,626 correlated observations are not 7,626 independent machines.
 
-## 项目结构与完整成果
+## Repository and complete artifacts
 
 ```text
-mbdnn/                       数据、网络、训练、指标、CLI、报告
-configs/                     两套协议及内部验证对照
-checks/                      关键完整性与流程检查
-scripts/                     数据下载、环境验证、模型测试与分析
-assets/                      原版GloVe子集与来源记录
-experiments/                 结果表、划分、审计、哈希与分析证据
-docs/figures/                12组科学图表，PNG / PDF
-docs/                        方法、验证、结果与发布说明
-dataset.json                 固定HF数据版本与ZIP哈希
-train_and_report.bat          一键检查、训练、测试、报告
-README.md / README.en.md      中文 / 英文指南
+mbdnn/                       Data, branches, training, metrics, CLI, reports
+configs/                     Two protocols and validation control
+checks/                      Essential integrity/workflow checks
+scripts/                     Download, environment validation, inference, analysis
+assets/                      Original GloVe subset and provenance
+experiments/                 Metrics, splits, audits, checksums, analysis evidence
+docs/figures/                Twelve scientific figure groups, PNG / PDF
+docs/                        Method, validation, results, publication documentation
+dataset.json                 Pinned Hub revision and ZIP hash
+train_and_report.bat          One-click preflight/train/test/report
+README.md / README.zh-CN.md   English default / Chinese guide
 ```
 
-Git排除原始数据、环境、工具、缓存、日志和运行工作目录；全部权重与预测通过Release保留。历史训练源码与指纹一并提供，v1.0.0的命名、文档及可移植性整理不改写已发布指标。
+Raw data, environments, tools, caches, logs, and working outputs are excluded from Git. Complete weights and predictions remain in release assets, alongside historical training sources and fingerprints. Naming/documentation/portability updates in v1.0.0 do not retroactively alter benchmark metrics.
 
-## 方法来源与简短文献对照
+## Method source and brief literature comparison
 
-分支设计参考Yang、Baraldi、Zio，*A multi-branch deep neural network model for failure prognostics based on multimodal data*，Journal of Manufacturing Systems 59 (2021), 42–50，[DOI](https://doi.org/10.1016/j.jmsy.2021.01.007)。该文三分支MAE为3.20，本项目目录级为4.8567；原始划分及全部优化细节未取得，来源隔离条件也不同，不主张逐数值一致。
+The branch design follows Yang, Baraldi, Zio, *A multi-branch deep neural network model for failure prognostics based on multimodal data*, Journal of Manufacturing Systems59 (2021),42–50,[DOI](https://doi.org/10.1016/j.jmsy.2021.01.007). Reported three-branch MAE is 3.20; this project's directory MAE is 4.8567. Original folds/all optimizer settings were unavailable and source isolation changes evaluation conditions; numerical identity is not claimed.
 
-## 许可与引用
+## License and citation
 
-项目代码：[MIT](LICENSE)。数据保留原作者署名，原发布说明未明确给出数据许可证，详见[数据卡](https://huggingface.co/datasets/GeorgeWJJ/steam-generator-multimodal-prognostics)。GloVe向量遵循上游Public Domain Dedication and License，独立于代码许可；见[第三方说明](THIRD_PARTY_NOTICES.md)。
+Code:[MIT](LICENSE). Dataset:original attribution and unspecified upstream terms, documented in the [dataset card](https://huggingface.co/datasets/GeorgeWJJ/steam-generator-multimodal-prognostics). GloVe vectors:upstream Public Domain Dedication and License, separate from code licensing; see [third-party notices](THIRD_PARTY_NOTICES.md).
 
-使用基准请引用原方法/数据论文；使用本项目实现、审计或结果，请标明仓库和Release版本。[CITATION.cff](CITATION.cff)提供项目引用元数据。
+Cite the original method/dataset paper for benchmark use; identify this repository and release version for implementation, audits, or results. [CITATION.cff](CITATION.cff) provides project citation metadata.
