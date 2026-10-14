@@ -14,6 +14,8 @@
 
 两套实验压缩后各约200MB；存入Release可避免Git克隆携带全部模型历史。每套包含175个神经网络、50个传统模型、25项单分支集成。
 
+两套ZIP解压后，运行 `python scripts/build_figures.py` 可根据冻结预测和 `experiments/analysis/diagnostics.json` 重新生成12组发布图表，不进行训练。
+
 ## English
 
 Each experiment asset contains 250 complete records, native checkpoints/models, per-row predictions, histories, preprocessing, fixed partitions, audit artifacts, and full reports/figures. Extract into the project root to restore relative `results/` and `artifacts/` paths, or inspect in a separate directory before replacing anything. The evaluation helper rebases raw-data paths at runtime.
